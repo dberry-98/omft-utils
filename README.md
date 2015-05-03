@@ -1,7 +1,7 @@
 
 # omft-utils
 
-Utility functions for use with Oracle MFT
+Utility functions for use with Oracle MFT - Mansged File Trabsfer
 
 ## Installation
 
@@ -21,12 +21,12 @@ TODO: Write usage instructions
 
 ## History
 
-TODO: Write history
+Created: May 3, 2015
 
 ## Credits
 
-TODO: Write credits
+Dave Berry A.K.A (bigfiles)
 
 ## License
 
-TODO: Write license
+ISC
