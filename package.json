@@ -1,11 +1,8 @@
 {
   "name": "omft-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Various utility function to be used with Oracle Managed File Transfer(MFT)",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/dberry-98/omft-utils"
@@ -33,7 +30,5 @@
     "test": "mocha"
   },
   "dependencies": {
-    "sinon": "^1.14.1",
-    "chai": "^2.3.0"
   }
 }
