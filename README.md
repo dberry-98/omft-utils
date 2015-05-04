@@ -10,10 +10,13 @@ npm install omft-utils --save
 ## Usage
 
 See examples folder
-  isbin.js  - function isBinary  
+
+function isBinary  
+
     var outils = require('omft-utils');
     console.log(outils.isBinary('test.bin));
     console.log(outils.isBinary('test.xml));
+
 
 ## Test
 
