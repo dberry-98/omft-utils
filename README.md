@@ -1,7 +1,7 @@
 
 # omft-utils
 
-Utility functions for use with Oracle MFT - Mansged File Trabsfer
+Utility functions for use with Oracle MFT - Managed File Transfer
 
 ## Installation
 
