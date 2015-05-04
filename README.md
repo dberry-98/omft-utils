@@ -5,7 +5,7 @@ Utility functions for use with Oracle MFT - Mansged File Trabsfer
 
 ## Installation
 
-TODO: Describe the installation process
+npn install --save
 
 ## Usage
 
