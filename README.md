@@ -5,11 +5,19 @@ Utility functions for use with Oracle MFT - Managed File Transfer
 
 ## Installation
 
-npn install --save
+npm install omft-utils --save
 
 ## Usage
 
-TODO: Write usage instructions
+See examples folder
+  isbin.js  - function isBinary  
+    var outils = require('omft-utils');
+    console.log(outils.isBinary('test.bin));
+    console.log(outils.isBinary('test.xml));
+
+## Test
+
+npm test
 
 ## Contributing
 

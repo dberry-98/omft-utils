@@ -1,0 +1,39 @@
+{
+  "name": "omft-utils",
+  "version": "1.0.0",
+  "description": "Various utility function to be used with Oracle Managed File Transfer(MFT)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dberry-98/omft-utils"
+  },
+  "keywords": [
+    "files",
+    "mft",
+    "soap",
+    "rest",
+    "oracle",
+    "sdk"
+  ],
+  "author": "Dave Berry <obigfiles@gmail.com> (https://github.com/dberry-98)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dberry-98/omft-utils/issues"
+  },
+  "homepage": "https://github.com/dberry-98/omft-utils",
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4",
+    "sinon": "^1.14.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "sinon": "^1.14.1",
+    "chai": "^2.3.0"
+  }
+}
