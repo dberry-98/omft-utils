@@ -33,6 +33,7 @@ npm install omft-utils --save
 ## Test
 
 npm install chai
+
 npm test
 
 ## Contributing
