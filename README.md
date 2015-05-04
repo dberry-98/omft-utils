@@ -11,11 +11,22 @@ npm install omft-utils --save
 
 [See examples folder](examples)
 
-    //function isBinary  
+    // function isBinary
+    // check file type before upload
     var outils = require('omft-utils');
     console.log(outils.isBinary('test.bin));
     console.log(outils.isBinary('test.xml));
 
+    // function parseCalloutArgs
+    // Parse arguments from an MFT callout
+    var outils = require('omft-utils');
+    var ar = [];
+    ar[0] = 'file=test.xml'
+    ar[1] = 'outfile=out.xml outdir=/tmp/mft'
+    var o = outils.parseCalloutArgs(ar);
+    console.log('o.file: ' +o.file);
+    console.log('o.outfile: ' +o.outfile);
+    console.log('o.outdir: ' +o.outdir);
 
 ## Test
 
