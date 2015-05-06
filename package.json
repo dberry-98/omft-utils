@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dberry-98/omft-utils"
+    "url": "https://github.com/gitmft/omft-utils"
   },
   "keywords": [
     "files",
@@ -15,12 +15,12 @@
     "oracle",
     "sdk"
   ],
-  "author": "Dave Berry <obigfiles@gmail.com> (https://github.com/dberry-98)",
+  "author": "Dave Berry <obigfiles@gmail.com> (https://github.com/gitmft)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dberry-98/omft-utils/issues"
+    "url": "https://github.com/gitmft/omft-utils/issues"
   },
-  "homepage": "https://github.com/dberry-98/omft-utils",
+  "homepage": "https://github.com/gitmft/omft-utils",
   "devDependencies": {
     "chai": "^2.3.0",
     "mocha": "^2.2.4",
