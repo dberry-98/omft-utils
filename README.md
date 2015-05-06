@@ -38,9 +38,7 @@ npm install omft-utils --save
 var outils = require('..');
 var fs = require("fs");
 var f1 = process.argv[1];
-
 var MAX_FILE_SIZE = 25*1024*1024;
-
 outils.genUploadSOAP(f1, MAX_FILE_SIZE, function(er, fs, bdy) {
   if (er) {
     console.log(err);
