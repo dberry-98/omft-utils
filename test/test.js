@@ -3,7 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var outils = require('..');
 
-describe('isBinary', function() {
+describe('omft-utils test suite', function() {
   it('Return true for filename of test.bin ', function() {
     var result = outils.isBinary('test.bin');
     expect(result).to.be.true; // verify results
@@ -23,26 +23,21 @@ describe('isBinary', function() {
     var result = obj.file +' ' +obj.outfile + ' ' +obj.outdir;
     expect(result).to.equal(resmatch); // verify results
   });
+
+  it('Validate generated soap body filesize for file test/genSoapTest.data ', function() {
+    var fp = 'test/genSoapTest.data';
+    var mysize = 544;
+    outils.genUploadSOAP(fp, 999999999, function(er, fs, bdy) {
+      if (er) {
+        console.log('genSoapTest: error ' +er);
+        throw err;
+      } 
+      //console.log('genSoapTest: result size is ' +fs);
+      result = fs;
+      expect(result).to.equal(mysize); // verify results
+    });
+  });
+
 });
 
 
-
-/*
-var outils = require('..');
-
-// simple example
-//   ar[0] = 'file=test.xml'
-//   ar[1] = 'outfile=out.xml outdir=/tmp/mft'
-//   ret = { file: 'test.xml', outfile: 'out.xml', outdir: '/mft/tmp' }
-
-var ar = [];
-ar[0] = 'file=test.xml';
-ar[1] = 'outfile=out.xml outdir=/tmp/mft';
-
-var o = outils.parseCalloutArgs(ar);
-console.log(o);
-console.log('o.file: ' +o.file);
-console.log('o.outfile: ' +o.outfile);
-console.log('o.outdir: ' +o.outdir);
-
-*/

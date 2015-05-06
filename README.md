@@ -1,7 +1,7 @@
 
 # omft-utils
 
-Utility functions for use with Oracle MFT - Managed File Transfer
+Utility functions for use with Oracle MFT - Managed File Transfer nodeJS modules and applications.
 
 ## Installation
 
@@ -29,6 +29,27 @@ npm install omft-utils --save
     console.log('o.file: ' +o.file);
     console.log('o.outfile: ' +o.outfile);
     console.log('o.outdir: ' +o.outdir);
+
+
+### Function genUploadSOAP
+#### Generate a SOAP payload for an MFT SOAP Source taking filepath as an argument
+
+```
+var outils = require('..');
+var fs = require("fs");
+var f1 = process.argv[1];
+
+var MAX_FILE_SIZE = 25*1024*1024;
+
+outils.genUploadSOAP(f1, MAX_FILE_SIZE, function(er, fs, bdy) {
+  if (er) {
+    console.log(err);
+    process.exit(1);
+  }
+  console.log('SUCCESS: filesize is ' +fs);
+  console.log('SOAP Body is ' +bdy);
+});
+```
 
 ## Test
 
