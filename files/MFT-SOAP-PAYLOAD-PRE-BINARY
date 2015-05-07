@@ -2,6 +2,7 @@
     <soap:Header>
         <ns1:MFTHeader xmlns:ns1="http://xmlns.oracle.com/fmw/mft/soap">
             <ns1:TargetFilename>%%FILENAME%%</ns1:TargetFilename>
+            <ns1:file.name>%%FILENAME%%</ns1:file.name>
         </ns1:MFTHeader>
     </soap:Header>
     <soap:Body>

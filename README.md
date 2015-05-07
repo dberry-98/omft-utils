@@ -11,13 +11,6 @@ npm install omft-utils --save
 
 [See examples folder](examples)
 
-### Function isBinary
-#### Check the file type before upload
-
-    var outils = require('omft-utils');
-    console.log(outils.isBinary('test.bin));
-    console.log(outils.isBinary('test.xml));
-
 ### Function parseCalloutArgs
 #### Parse arguments from an MFT callout
 
@@ -48,6 +41,16 @@ outils.genUploadSOAP(f1, MAX_FILE_SIZE, function(er, fs, bdy) {
   console.log('SOAP Body is ' +bdy);
 });
 ```
+
+### Function isBinary
+#### Check the file type before upload
+
+    var outils = require('omft-utils');
+    console.log(outils.isBinary('test.bin));
+    console.log(outils.isBinary('test.xml));
+
+This package is a better option so this Function  will ultimately be deprecated..
+https://github.com/bevry/istextorbinary
 
 ## Test
 
