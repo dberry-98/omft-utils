@@ -25,20 +25,23 @@ npm install omft-utils --save
 
 
 ### Function genUploadSOAP
-#### Generate a SOAP payload for an MFT SOAP Source taking filepath as an argument
+#### Generate a SOAP payload for an MFT SOAP Source 
 
 ```
+// type = "SOAP|FORM"
 var outils = require('..');
 var fs = require("fs");
 var f1 = process.argv[1];
+var type = "SOAP" // or "FORM"
 var MAX_FILE_SIZE = 25*1024*1024;
-outils.genUploadSOAP(f1, MAX_FILE_SIZE, function(er, fs, bdy) {
+outils.genUploadSOAP(f1, MAX_FILE_SIZE, type, function(er, fs, bdy) {
   if (er) {
     console.log(err);
     process.exit(1);
   }
   console.log('SUCCESS: filesize is ' +fs);
-  console.log('SOAP Body is ' +bdy);
+  console.log('type is ' +type);
+  console.log('Body is ' +bdy);
 });
 ```
 

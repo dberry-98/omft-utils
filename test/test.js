@@ -27,7 +27,7 @@ describe('omft-utils test suite', function() {
   it('Validate generated soap body filesize for file test/genSoapTest.data ', function() {
     var fp = 'test/genSoapTest.data';
     var mysize = 544;
-    outils.genUploadSOAP(fp, 999999999, function(er, fs, bdy) {
+    outils.genUploadSOAP(fp, 999999999, 'SOAP', function(er, fs, bdy) {
       if (er) {
         console.log('genSoapTest: error ' +er);
         throw err;

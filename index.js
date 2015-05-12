@@ -1,6 +1,23 @@
 var path = require("path");
 var fs = require("fs");
 
+// INTERNAL FUNCTIONS AND PROPERTIES
+
+_TEMPLATE_DIR = __dirname +'/files/';
+
+function splitArgs(m, str) {
+        str.split(' ').forEach(function(x){
+                var arr = x.split('=');
+                var a0 = arr[0];
+                var a1 = arr[1];
+                if (a1) {
+                  arr[1] && (m[arr[0]] = arr[1]);
+                };
+        });
+};
+
+module.exports.genUploadSOAP = genUploadSOAP;
+
 module.exports = {
   /**
    * Used to determine if filename is a binary file for upload
@@ -82,15 +99,16 @@ var isBinary = module.exports.isBinary;
 **/
 
 // generate SOAP body for SOAP Upload
-var genUploadSOAP = function(filepath, maxfilesize, cb) {
+var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   //console.log('genUploadSOAP: '+filepath +' ' +maxfilesize);
   // cb(err, soapbody)
+  var soaptype = type || "SOAP";
 
-  var tfiles = path.dirname(module.filename) +'/files/';
-  //var tfiles = path.dirname(process.argv[1]) +'/files/';
+  //var tfiles = path.dirname(module.filename) +'/files/';
+  var tfiles = _TEMPLATE_DIR; 
   var templates = {
-    pre:     tfiles+'MFT-SOAP-PAYLOAD-PRE',
-    post:    tfiles+'MFT-SOAP-PAYLOAD-POST',
+    pre:     tfiles+ soaptype +'-PAYLOAD-PRE',
+    post:    tfiles+ soaptype +'-PAYLOAD-POST'
   };
 
   var cache = {
@@ -129,14 +147,3 @@ var genUploadSOAP = function(filepath, maxfilesize, cb) {
 
 module.exports.genUploadSOAP = genUploadSOAP;
 
-// INTERNAL FUNCTIONS
-function splitArgs(m, str) {
-        str.split(' ').forEach(function(x){
-                var arr = x.split('=');
-                var a0 = arr[0];
-                var a1 = arr[1];
-                if (a1) {
-                  arr[1] && (m[arr[0]] = arr[1]);
-                };
-        });
-};

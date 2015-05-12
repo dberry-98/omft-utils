@@ -1,6 +1,6 @@
 {
   "name": "omft-utils",
-  "version": "1.0.9",
+  "version": "10.0.10",
   "description": "Various utility function to be used with Oracle Managed File Transfer(MFT)",
   "main": "index.js",
   "repository": {
