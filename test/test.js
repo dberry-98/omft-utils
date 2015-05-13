@@ -4,14 +4,18 @@ var expect = chai.expect;
 var outils = require('..');
 
 describe('omft-utils test suite', function() {
-  it('Return true for filename of test.bin ', function() {
-    var result = outils.isBinary('test.bin');
-    expect(result).to.be.true; // verify results
+  var f1 = './test/binfile';
+  var f2 = 'README.md';
+  var f4 = './test/genSoapTest.data';
+
+  it('Return true for file ' +f1, function() {
+    var r1 = outils.isBinary(f1);
+    expect(r1).to.be.true; // verify results
   });
 
-  it('Return false for filename of test.xml ', function() {
-    var result = outils.isBinary('test.xml');
-    expect(result).to.be.false; // verify results
+  it('Return false for file ' + f2, function() {
+    var r2 = outils.isBinary(f2);
+    expect(r2).to.be.false; // verify results
   });
 
   it('Parse input parameters from MFT RunScript callout ', function() {
@@ -20,21 +24,32 @@ describe('omft-utils test suite', function() {
     ar[1] = 'outfile=out.xml outdir=/tmp/mft';
     var obj = outils.parseCalloutArgs(ar);
     var resmatch = 'test.xml out.xml /tmp/mft';
-    var result = obj.file +' ' +obj.outfile + ' ' +obj.outdir;
-    expect(result).to.equal(resmatch); // verify results
+    var r3 = obj.file +' ' +obj.outfile + ' ' +obj.outdir;
+    expect(r3).to.equal(resmatch); // verify results
   });
 
   it('Validate generated soap body filesize for file test/genSoapTest.data ', function() {
-    var fp = 'test/genSoapTest.data';
     var mysize = 544;
-    outils.genUploadSOAP(fp, 999999999, function(er, fs, bdy) {
+    outils.genUploadSOAP(f4, 999999999, 'SOAP', function(er, fsz, bdy) {
       if (er) {
-        console.log('genSoapTest: error ' +er);
+        console.log('genSoapTest SOAP: error ' +er);
         throw err;
       } 
-      //console.log('genSoapTest: result size is ' +fs);
-      result = fs;
-      expect(result).to.equal(mysize); // verify results
+      var r4 = fsz;
+      expect(r4).to.equal(mysize); // verify results
+    });
+  });
+
+  it('Validate generated soap body empty for type=WSA attachments', function() {
+    var mysize = 753;
+    outils.genUploadSOAP(f4, 999999999, 'WSA', function(er, fsz, bdy) {
+      if (er) {
+        console.log('genSoapTest WSA: error ' +er);
+        throw err;
+      } 
+      console.log("bdy i s" +bdy);
+      var r5 = bdy.length;
+      expect(r5).to.equal(mysize); // verify results
     });
   });
 

@@ -1,6 +1,23 @@
 var path = require("path");
 var fs = require("fs");
 
+// INTERNAL FUNCTIONS AND PROPERTIES
+
+_TEMPLATE_DIR = __dirname +'/files/';
+
+function splitArgs(m, str) {
+        str.split(' ').forEach(function(x){
+                var arr = x.split('=');
+                var a0 = arr[0];
+                var a1 = arr[1];
+                if (a1) {
+                  arr[1] && (m[arr[0]] = arr[1]);
+                };
+        });
+};
+
+module.exports.genUploadSOAP = genUploadSOAP;
+
 module.exports = {
   /**
    * Used to determine if filename is a binary file for upload
@@ -10,32 +27,22 @@ module.exports = {
    *
   **/
   isBinary: function(filename) {
-    var ft ='';
-    try {
-      var ft = path.extname(filename);
-      // this is just the beginning. Add more types as needed.
-      switch (ft) {
-        case '.png':
-        case '.jpg':
-        case '.zip':
-        case '.tar':
-        case '.mov':
-        case '.m4v':
-        case '.xls':
-        case '.doc':
-        case '.bin':
-        case '.exe':
-        case '.bmp':
-        case '.gif':
-          return true;
-        default:
-          return false;
+    var retval;
+
+    // validate file exists
+    var fstats = fs.statSync(filename);
+
+    require('istextorbinary').isBinary(filename, '', function(err, result){
+      if (err) {
+        var ex  = 'isBinary exception: ' +err;
+        console.log(ex);
+        return undefined;
+      } else {
+        //console.log("file " +filename +" is binary " +result);
+        retval = result;
       }
-    } catch (e) {
-      var ex  = 'isBinary exception: ' +e;
-      console.log(ex);
-      throw ex;
-    }
+    });
+    return retval;
   },
   /**
    * Used to parse name/value pair arguments from the MFT RunScript Callout
@@ -47,10 +54,10 @@ module.exports = {
   parseCalloutArgs: function(ar) {
     // array items may have more than 1 name/value pair
     // names with no values are ignored
-    // example: 
+    // example:
     //   ar[0] = 'file=test.xml'
     //   ar[1] = 'outfile=out.xml outdir=/tmp/mft'
-    //   ret = {file: 'test.xml', outfile: 'out.xml', outdir: '/mft/tmp'} 
+    //   ret = {file: 'test.xml', outfile: 'out.xml', outdir: '/mft/tmp'}
     var ret = {};
     if (!ar) return ret;
     try {
@@ -82,15 +89,16 @@ var isBinary = module.exports.isBinary;
 **/
 
 // generate SOAP body for SOAP Upload
-var genUploadSOAP = function(filepath, maxfilesize, cb) {
+var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   //console.log('genUploadSOAP: '+filepath +' ' +maxfilesize);
   // cb(err, soapbody)
+  var soaptype = type || "SOAP";
 
-  var tfiles = path.dirname(module.filename) +'/files/';
-  //var tfiles = path.dirname(process.argv[1]) +'/files/';
+  //var tfiles = path.dirname(module.filename) +'/files/';
+  var tfiles = _TEMPLATE_DIR; 
   var templates = {
-    pre:     tfiles+'MFT-SOAP-PAYLOAD-PRE',
-    post:    tfiles+'MFT-SOAP-PAYLOAD-POST',
+    pre:     tfiles+ soaptype +'-PAYLOAD-PRE',
+    post:    tfiles+ soaptype +'-PAYLOAD-POST'
   };
 
   var cache = {
@@ -108,8 +116,12 @@ var genUploadSOAP = function(filepath, maxfilesize, cb) {
     return cb(e);
   }
 
+  // a bit of a hack to support WSA which doens't want the body inserted here.
+  if (type === 'WSA')
+    filebody = "";
+  else 
   // get file body and adjust templates for binary payload
-  if (isBinary(filename)) {
+  if (isBinary(filepath)) {
     templates.pre = templates.pre+'-BINARY';
     templates.post = templates.post+'-BINARY';
     filebody = fs.readFileSync(filepath).toString('base64');
@@ -129,14 +141,3 @@ var genUploadSOAP = function(filepath, maxfilesize, cb) {
 
 module.exports.genUploadSOAP = genUploadSOAP;
 
-// INTERNAL FUNCTIONS
-function splitArgs(m, str) {
-        str.split(' ').forEach(function(x){
-                var arr = x.split('=');
-                var a0 = arr[0];
-                var a1 = arr[1];
-                if (a1) {
-                  arr[1] && (m[arr[0]] = arr[1]);
-                };
-        });
-};

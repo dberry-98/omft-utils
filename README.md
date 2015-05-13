@@ -25,32 +25,44 @@ npm install omft-utils --save
 
 
 ### Function genUploadSOAP
-#### Generate a SOAP payload for an MFT SOAP Source taking filepath as an argument
+#### Generate a SOAP payload for an MFT SOAP Source 
 
 ```
+// type = "SOAP|FORM"
 var outils = require('..');
 var fs = require("fs");
 var f1 = process.argv[1];
+var type = "SOAP" // or "FORM"
 var MAX_FILE_SIZE = 25*1024*1024;
-outils.genUploadSOAP(f1, MAX_FILE_SIZE, function(er, fs, bdy) {
+outils.genUploadSOAP(f1, MAX_FILE_SIZE, type, function(er, fs, bdy) {
   if (er) {
     console.log(err);
     process.exit(1);
   }
   console.log('SUCCESS: filesize is ' +fs);
-  console.log('SOAP Body is ' +bdy);
+  console.log('type is ' +type);
+  console.log('Body is ' +bdy);
 });
 ```
 
 ### Function isBinary
 #### Check the file type before upload
 
-    var outils = require('omft-utils');
-    console.log(outils.isBinary('test.bin));
-    console.log(outils.isBinary('test.xml));
+```
+// simple example
+var f1 = process.argv[1];
+var f2 = './test/binfile';
+var f3 = 'NOFILE';
+var result,s;
 
-This package is a better option so this Function  will ultimately be deprecated..
-https://github.com/bevry/istextorbinary
+try {
+  console.log(outils.isBinary(f1)); // returns true
+  console.log(outils.isBinary(f2)); // returns false
+  console.log(outils.isBinary(f3)); // throws error
+} catch (e) {
+  console.log(e);
+};
+```
 
 ## Test
 

@@ -1,9 +1,17 @@
 var outils = require('..');
 
 // simple example
-var f1 = 'test.bin';
-var f2 = 'test.xml';
+var f1 = process.argv[1];
+var f2 = './test/binfile';
+var f3 = 'NOFILE';
+var result,s;
 
-console.log('Result for ' +f1 +' ' +outils.isBinary(f1));
-console.log('Result for ' +f2 +' ' +outils.isBinary(f2));
+try {
+  console.log(outils.isBinary(f1));
+  console.log(outils.isBinary(f2));
+  console.log(outils.isBinary(f3));
+
+} catch (e) {
+  console.log(e);
+};
 
