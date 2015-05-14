@@ -3,7 +3,7 @@ var fs = require("fs");
 
 // INTERNAL FUNCTIONS AND PROPERTIES
 
-_TEMPLATE_DIR = __dirname +'/files/';
+_TEMPLATE_DIR = path.join(__dirname, '/files/');
 
 function splitArgs(m, str) {
         str.split(' ').forEach(function(x){
@@ -15,8 +15,6 @@ function splitArgs(m, str) {
                 };
         });
 };
-
-module.exports.genUploadSOAP = genUploadSOAP;
 
 module.exports = {
   /**
@@ -88,6 +86,34 @@ var isBinary = module.exports.isBinary;
  *
 **/
 
+/*
+var _options = {
+  "type":          "SOAP",
+  "file":          "",
+  "maxsize":       26214400,
+  "templatedir":   ""
+};
+*/
+
+// wrapper function for genUploadSOAP and others
+var genUploadRequest = function(opts, cb) {
+  var type = opts.type;
+  var ctype = opts.ctype; // binary==base64 encoding text==utf8
+  var file = opts.file;
+  var maxsize = opts.maxsize 
+  var templatedir = opts.templatedir;
+
+ _TEMPLATE_DIR = templatedir || _TEMPLATE_DIR;
+
+  //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
+
+  // we'll do more stuff here later with non SOAP type and separate out the template retriever
+  return(genUploadSOAP(file, maxsize, type, cb)); 
+
+};
+
+module.exports.genUploadRequest = genUploadRequest;
+
 // generate SOAP body for SOAP Upload
 var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   //console.log('genUploadSOAP: '+filepath +' ' +maxfilesize);
@@ -97,8 +123,8 @@ var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   //var tfiles = path.dirname(module.filename) +'/files/';
   var tfiles = _TEMPLATE_DIR; 
   var templates = {
-    pre:     tfiles+ soaptype +'-PAYLOAD-PRE',
-    post:    tfiles+ soaptype +'-PAYLOAD-POST'
+    pre:     path.join(tfiles, soaptype +'-PAYLOAD-PRE'),
+    post:    path.join(tfiles, soaptype +'-PAYLOAD-POST')
   };
 
   var cache = {

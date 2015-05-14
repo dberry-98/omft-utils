@@ -47,8 +47,28 @@ describe('omft-utils test suite', function() {
         console.log('genSoapTest WSA: error ' +er);
         throw err;
       } 
-      console.log("bdy i s" +bdy);
+      //console.log("bdy i s" +bdy);
       var r5 = bdy.length;
+      expect(r5).to.equal(mysize); // verify results
+    });
+  });
+
+  it('Validate generated reuest body filesize for file test/genSoapTest.data ', function() {
+    var mysize = 1810;
+    var opts = {
+      "type":          "SOAP",
+      "file":          f2,
+      "filetype":      "binary",
+      "maxsize":       26214400,
+      "templatedir":   __dirname
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, bdy) {
+      if (er) {
+        console.log('genSoapTest SOAP: error ' +er);
+        throw err;
+      } 
+      var r5 = fsz;
       expect(r5).to.equal(mysize); // verify results
     });
   });
