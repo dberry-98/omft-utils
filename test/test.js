@@ -53,11 +53,11 @@ describe('omft-utils test suite', function() {
     });
   });
 
-  it('Validate generated reuest body filesize for file test/genSoapTest.data ', function() {
-    var mysize = 1810;
+  it('Validate generated request body filesize for file test/genSoapTest.data ', function() {
+    var mysize = 544; //1810;
     var opts = {
       "type":          "SOAP",
-      "file":          f2,
+      "file":          f4,
       "filetype":      "binary",
       "maxsize":       26214400,
       "templatedir":   __dirname

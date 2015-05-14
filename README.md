@@ -24,6 +24,30 @@ npm install omft-utils --save
     console.log('o.outdir: ' +o.outdir);
 
 
+### Function genUploadRequest (can front end genUploadSoap) 
+#### Generate a payload for any type of MFT request. SOAP, WSA, HTTP Forms etc...
+#### Takes an options object as an argument so it is easy to extend.
+
+```
+var opts = { "type": "SOAP", "ctype": "binary", "file": process.argv[1], "filetype": "binary",
+  "maxsize": 26214400, "templatedir": path.join(__dirname, '../files')
+};
+
+outils.genUploadRequest(opts, function(er, fsz, bdy) {
+  if (er) {
+    console.log('genRequestTest SOAP: error ' +er);
+    process.exit(1);
+  }
+  console.log('SUCCESS: filesize is ' +fsz);
+  console.log('file is   ' +opts.file);
+  console.log('type is    ' +opts.type);
+  console.log('ctype is   ' +opts.ctype);
+  console.log('maxsize is   ' +opts.maxsize);
+  console.log('templatedir is   ' +opts.templatedir);
+  console.log('Body is   ' +bdy);
+});
+```
+
 ### Function genUploadSOAP
 #### Generate a SOAP payload for an MFT SOAP Source 
 
