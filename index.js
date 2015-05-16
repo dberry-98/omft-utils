@@ -17,6 +17,8 @@ function splitArgs(m, str) {
         });
 };
 
+
+
 module.exports = {
   /**
    * Used to determine if filename is a binary file for upload
@@ -105,6 +107,8 @@ var genUploadRequest = function(opts, cb) {
   var file = opts.file;
   var maxsize = opts.maxsize 
   var templatedir = opts.templatedir;
+  var subvals = {};
+  var ts = new Date().toISOString();
 
   //console.log("_ISBINARY: " +_ISBINARY);
   //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
@@ -144,13 +148,16 @@ var genUploadRequest = function(opts, cb) {
 
   // get template files and set request body
   var str = fs.readFileSync(templates.pre, "utf8");
-  str = str.replace(/%%FILENAME%%/g, file);
+  subvals.FILENAME = file;
 
   // sub in credentials for WSSE case
   if (opts.user)
-    str = str.replace(/%%USERNAME%%/g, opts.user);
+    subvals.USERNAME = opts.user;
   if (opts.pass)
-    str = str.replace(/%%PASSWORD%%/g, opts.pass);
+    subvals.PASSWORD = opts.pass;
+
+
+  str = varSub(str, subvals);
 
   cache.pre = str.substring(0, str.length-1);
   str = fs.readFileSync(templates.post, "utf8");
@@ -217,3 +224,47 @@ var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
 
 module.exports.genUploadSOAP = genUploadSOAP;
 
+// function do paramterised substistutions
+String.prototype.myRep = function (replaceThis, withThis) {
+   var re = new RegExp(replaceThis,"g");
+   return this.replace(re, withThis);
+};
+module.exports.myRep = String.prototype.myRep;
+
+// function to do Templatized substitution
+var varSub = function(data, vals, delim) {
+// data = "Hello %%NAME%% it is now %%ISOTIME%%"
+// nvp = {"nAmE": 'dave", "isotime": ""};
+
+  if (!delim) delim = '%%';
+
+// data is field that gets changed
+// nvp is list of sub names and values
+
+  for (var key in vals) {
+    if (vals.hasOwnProperty(key)) {
+      //console.log(key + " -> " + vals[key]);
+      var n1 =  key;
+      var v1 = vals[n1]
+      var sn = n1.toUpperCase();
+      var sn = delim +sn +delim;
+      //console.log(n1 + " -> " + v1);
+      data = data.myRep(sn, v1);
+    };
+  };
+  return data;
+};
+module.exports.varSub = varSub;
+
+/*
+  for (var key in vals) {
+    if (vals.hasOwnProperty(key)) {
+      //console.log(key + " -> " + vals[key]);
+      var n1 =  key.toUpperCase();
+      n1 = delim +n1 +delim;
+      var v1 = vals[key]
+      data = data.myRep(n1, v1);
+    };
+  };
+
+*/

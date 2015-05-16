@@ -53,8 +53,8 @@ describe('omft-utils test suite', function() {
     });
   });
 
-  it('Validate generated request body filesize for file test/genSoapTest.data ', function() {
-    var mysize = 544; //1810;
+  it('Validate templating and generated request body filesize for file test/genSoapTest.data ', function() {
+    var mysize = 1328;
     var opts = {
       "type":          "SOAP",
       "file":          f4,
@@ -68,11 +68,27 @@ describe('omft-utils test suite', function() {
         console.log('genSoapTest SOAP: error ' +er);
         throw err;
       } 
-      var r5 = fsz;
+      var r5 = bdy.length;
       expect(r5).to.equal(mysize); // verify results
     });
   });
 
-});
+  it('Validate varSub templating ', function() {
+    var mystr = 'Hello Dave it is now '; 
+    var ts = new Date().toISOString();
+    var data =  'Hello %%NAME%% it is now %%ISOTIME%%';
+    var vals = {'NAME': 'Dave', 'isoTIME': ts};
+    var r6 = outils.varSub(data, vals);
+    expect(r6).to.have.string(mystr); // verify results
+  });
 
+  it('Validate varSub templating with alternate substr', function() {
+    var mystr = 'Hello Dave it is now %%ISOTIME%%'; 
+    var ts = new Date().toISOString();
+    var data = 'Hello ##NAME## it is now %%ISOTIME%%';
+    var vals = {'name': 'Dave', 'isoTIME': ts};
+    var r7 = outils.varSub(data, vals, '##');
+    expect(r7).to.equal(mystr); // verify results
+  });
+});
 

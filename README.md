@@ -69,6 +69,16 @@ outils.genUploadSOAP(f1, MAX_FILE_SIZE, type, function(er, fs, bdy) {
 });
 ```
 
+### Function varSub
+#### A simple paramterized substitution templating interface
+#### Takes date string and subvar object as arguments with optional delimeter as 3rd argument
+'''
+var ts = new Date().toISOString();
+var data =  'Hello %%NAME%% it is now %%ISOTIME%%';
+var vals = {'NAME': 'Dave', 'isoTIME': ts};
+console.log(outils.varSub(data, vals));
+'''
+
 ### Function isBinary
 #### Check the file type before upload
 
