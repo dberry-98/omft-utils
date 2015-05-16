@@ -24,13 +24,19 @@ npm install omft-utils --save
     console.log('o.outdir: ' +o.outdir);
 
 
-### Function genUploadRequest (can front end genUploadSoap) 
-#### Generate a payload for any type of MFT request. SOAP, WSA, HTTP Forms etc...
+### Function genUploadRequest 
+#### Generate a payload for any type of MFT request. SOAP, WSA, WSSE ... 
 #### Takes an options object as an argument so it is easy to extend.
 
+This is JSON file but supports coments.
+
 ```
-var opts = { "type": "SOAP", "ctype": "binary", "file": process.argv[1], "filetype": "binary",
-  "maxsize": 26214400, "templatedir": path.join(__dirname, '../files')
+var opts = {
+  "type": "SOAP",             // "WSA"
+  "ctype": "binary",          // "TEXT"
+  "file": process.argv[1],
+  "maxsize": 26214400,
+  "templatedir": path.join(__dirname, '../files')
 };
 
 outils.genUploadRequest(opts, function(er, fsz, bdy) {
@@ -48,39 +54,20 @@ outils.genUploadRequest(opts, function(er, fsz, bdy) {
 });
 ```
 
-### Function genUploadSOAP
-#### Generate a SOAP payload for an MFT SOAP Source 
-
-```
-// type = "SOAP|FORM"
-var outils = require('..');
-var fs = require("fs");
-var f1 = process.argv[1];
-var type = "SOAP" // or "FORM"
-var MAX_FILE_SIZE = 25*1024*1024;
-outils.genUploadSOAP(f1, MAX_FILE_SIZE, type, function(er, fs, bdy) {
-  if (er) {
-    console.log(err);
-    process.exit(1);
-  }
-  console.log('SUCCESS: filesize is ' +fs);
-  console.log('type is ' +type);
-  console.log('Body is ' +bdy);
-});
-```
-
 ### Function varSub
 #### A simple paramterized substitution templating interface
 #### Takes date string and subvar object as arguments with optional delimeter as 3rd argument
-'''
+#### Returns the substituted result
+```
 var ts = new Date().toISOString();
 var data =  'Hello %%NAME%% it is now %%ISOTIME%%';
 var vals = {'NAME': 'Dave', 'isoTIME': ts};
 console.log(outils.varSub(data, vals));
-'''
+```
 
 ### Function isBinary
-#### Check the file type before upload
+#### Checks the file type before upload
+#### Returns true for binary, false for text or error for file not found
 
 ```
 // simple example

@@ -58,7 +58,6 @@ describe('omft-utils test suite', function() {
     var opts = {
       "type":          "SOAP",
       "file":          f4,
-      "filetype":      "binary",
       "maxsize":       26214400,
       "templatedir":   __dirname
     };
@@ -68,6 +67,7 @@ describe('omft-utils test suite', function() {
         console.log('genSoapTest SOAP: error ' +er);
         throw err;
       } 
+      //console.log('genSoapTest SOAP: body:' +bdy);
       var r5 = bdy.length;
       expect(r5).to.equal(mysize); // verify results
     });
@@ -90,5 +90,30 @@ describe('omft-utils test suite', function() {
     var r7 = outils.varSub(data, vals, '##');
     expect(r7).to.equal(mystr); // verify results
   });
+
+
+  it('Test ctype=text for file test/genSoapTest.data ', function() {
+    var mysize = 1141;
+    var opts = {
+      "type":          "SOAP",
+      "ctype":         "TEXT",
+      "file":          f4,
+      "maxsize":       26214400,
+      "templatedir":   __dirname
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, bdy) {
+      if (er) {
+        console.log('genSoapTest SOAP: error ' +er);
+        throw err;
+      } 
+      //console.log('genSoapTest SOAP: body:' +bdy);
+      var r8 = bdy.length;
+      expect(r8).to.equal(mysize); // verify results
+    });
+  });
+
+
+
 });
 

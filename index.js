@@ -92,7 +92,7 @@ var isBinary = module.exports.isBinary;
 /*
 var _options = {
   "type":          "SOAP",
-  "ctype":         "binary",
+  "ctype":         "binary", // || TEXT // binary==base64 encoding text==utf8
   "file":          "",
   "maxsize":       26214400,
   "templatedir":   ""
@@ -102,13 +102,18 @@ var _options = {
 // wrapper function for genUploadSOAP and others
 var genUploadRequest = function(opts, cb) {
   var type = opts.type;
-  var ctype = (opts.ctype);                     // binary==base64 encoding text==utf8
-  ctype = String.prototype.toUpperCase(ctype);
+  var ctype = opts.ctype;            
+  if (ctype) ctype=ctype.toUpperCase();
   var file = opts.file;
   var maxsize = opts.maxsize 
   var templatedir = opts.templatedir;
   var subvals = {};
   var ts = new Date().toISOString();
+  var filebody = '';
+  var gettxt = false;
+  var getbin = false;
+  var getbody = true;
+  var templates = true;
 
   //console.log("_ISBINARY: " +_ISBINARY);
   //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
@@ -122,10 +127,10 @@ var genUploadRequest = function(opts, cb) {
     return cb(e);
   }
 
-  var tfiles = templatedir || _TEMPLATE_DIR;
-  var templates = {
-    pre:     path.join(tfiles, type +'-PAYLOAD-PRE'),
-    post:    path.join(tfiles, type +'-PAYLOAD-POST')
+  var tdir = templatedir || _TEMPLATE_DIR;
+  var tfiles = {
+    pre:     path.join(tdir, type +'-PAYLOAD-PRE'),
+    post:    path.join(tdir, type +'-PAYLOAD-POST')
   };
 
   var cache = {
@@ -133,40 +138,83 @@ var genUploadRequest = function(opts, cb) {
     post:     'placeholder',
   };
 
+
+  if (type === 'WSA') getbody= false;
+
+  //console.log("Ctype: " +ctype);
+  switch (ctype) {
+    case 'TEXT':
+      getbody ? getbody = ctype : false;
+      //console.log("TEXT Getbody: " +getbody +ctype);
+      break;
+    case 'BINARY':
+      getbody ? getbody = ctype : false;
+      //console.log("BINARY Getbody: " +getbody) +ctype;
+      break;
+    default: 
+      //console.log("DEFAULT Getbody: " +getbody) +ctype;
+      if (getbody) {
+        if (isBinary(file)) 
+          getbody = 'BINARY'
+        else
+          getbody = 'TEXT';
+      };
+  };
+
+  //console.log("Getbody: " +getbody);
+
+  // this is SOAP inline case
+  if (getbody == 'TEXT') { 
+    // assign the templates case
+    filebody = fs.readFileSync(file, "utf8");
+    tfiles.pre = tfiles.pre+'-TEXT';
+    tfiles.post = tfiles.post+'-TEXT';
+  }
+  // this is SOAP Binary
+  if (getbody == 'BINARY')
+    filebody = fs.readFileSync(file).toString('base64');
+
+/*
   // a bit of a hack to support WSA which doens't want the body inserted here.
   if (type === 'WSA')
     filebody = "";
   else 
-  // get file body and adjust templates for binary payload
-  if (ctype = 'BINARY' || isBinary(file)) {
-    filebody = fs.readFileSync(file).toString('base64');
+  // get file body and adjust templates for text payload
+  if (ctype = 'TEXT') {
+    filebody = fs.readFileSync(file, "utf8");
   } else {
-    templates.pre = templates.pre+'-TEXT';
-    templates.post = templates.post+'-TEXT';
+  // get file body and adjust templates for binary payload
+  if (ctype = 'BINARY')) {
+    filebody = fs.readFileSync(file).toString('base64');
+    isbin = true;
+  } else {
+    tfiles.pre = tfiles.pre+'-TEXT';
+    tfiles.post = tfiles.post+'-TEXT';
     filebody = fs.readFileSync(file, "utf8");
   };
 
-  // get template files and set request body
-  var str = fs.readFileSync(templates.pre, "utf8");
-  subvals.FILENAME = file;
+*/
 
+  // create subvals which can be used on PRE template or body if !templates
   // sub in credentials for WSSE case
+  subvals.FILENAME = file;
   if (opts.user)
     subvals.USERNAME = opts.user;
   if (opts.pass)
     subvals.PASSWORD = opts.pass;
 
-
-  str = varSub(str, subvals);
-
-  cache.pre = str.substring(0, str.length-1);
-  str = fs.readFileSync(templates.post, "utf8");
-  cache.post = str.substring(0, str.length-1);
-  var bdy = cache.pre +filebody +cache.post;
+  // no read the templates
+  var str, bdy;
+  // get template files and set request body
+  if (templates) {
+    str = fs.readFileSync(tfiles.pre, "utf8");
+    str = varSub(str, subvals);
+    cache.pre = str.substring(0, str.length-1);
+    str = fs.readFileSync(tfiles.post, "utf8");
+    cache.post = str.substring(0, str.length-1);
+    bdy = cache.pre +filebody +cache.post;
+  }; // we'll do else for no templates case later
   return cb(e, filesize, bdy);
-
-  // we'll do more stuff here later with non SOAP type and separate out the template retriever
-  //return(genUploadSOAP(file, maxsize, type, cb)); 
 
 };
 
@@ -178,10 +226,10 @@ var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   // cb(err, soapbody)
   var soaptype = type || "SOAP";
 
-  var tfiles = _TEMPLATE_DIR; 
-  var templates = {
-    pre:     path.join(tfiles, soaptype +'-PAYLOAD-PRE'),
-    post:    path.join(tfiles, soaptype +'-PAYLOAD-POST')
+  var tdir = _TEMPLATE_DIR; 
+  var tfiles = {
+    pre:     path.join(tdir, soaptype +'-PAYLOAD-PRE'),
+    post:    path.join(tdir, soaptype +'-PAYLOAD-POST')
   };
 
   var cache = {
@@ -207,16 +255,16 @@ var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
   if (_ISBINARY || isBinary(filepath)) {
     filebody = fs.readFileSync(filepath).toString('base64');
   } else {
-    templates.pre = templates.pre+'-TEXT';
-    templates.post = templates.post+'-TEXT';
+    tfiles.pre = tfiles.pre+'-TEXT';
+    tfiles.post = tfiles.post+'-TEXT';
     filebody = fs.readFileSync(filepath, "utf8");
   };
 
   // get template files and set request body
-  var str = fs.readFileSync(templates.pre, "utf8");
+  var str = fs.readFileSync(tfiles.pre, "utf8");
   str = str.replace(/%%FILENAME%%/g, filename);
   cache.pre = str.substring(0, str.length-1);
-  str = fs.readFileSync(templates.post, "utf8");
+  str = fs.readFileSync(tfiles.post, "utf8");
   cache.post = str.substring(0, str.length-1);
   var bdy = cache.pre +filebody +cache.post;
   return cb(e, filesize, bdy);
