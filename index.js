@@ -5,6 +5,7 @@ var fs = require("fs");
 
 _TEMPLATE_DIR = path.join(__dirname, '/files/');
 _ISBINARY = false;
+_REQUIRE_TEMPLATES_DEAFULT = true;
 
 function splitArgs(m, str) {
         str.split(' ').forEach(function(x){
@@ -17,7 +18,26 @@ function splitArgs(m, str) {
         });
 };
 
-
+// convenience method to get the templates files
+// returns an error or the file
+function getTemplate(fp, req) {
+  var ret, str;
+  //console.log('getTemplate:' +fp +' ' +req);
+  try {
+    // normal path
+    str = fs.readFileSync(fp, "utf8");
+    ret = str.substring(0, str.length-1);
+  } catch (e) {
+    if (req) {
+      // pass the error upstream
+      throw e;
+    } else {
+      //console.log('getTemplate read template error ignored:' +e);
+      return '';
+    };
+  };
+  return ret;
+};
 
 module.exports = {
   /**
@@ -113,7 +133,7 @@ var genUploadRequest = function(opts, cb) {
   var gettxt = false;
   var getbin = false;
   var getbody = true;
-  var templates = true;
+  var reqtemps = (opts.reqtemps == false ? false : _REQUIRE_TEMPLATES_DEAFULT);
 
   //console.log("_ISBINARY: " +_ISBINARY);
   //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
@@ -174,26 +194,6 @@ var genUploadRequest = function(opts, cb) {
   if (getbody == 'BINARY')
     filebody = fs.readFileSync(file).toString('base64');
 
-/*
-  // a bit of a hack to support WSA which doens't want the body inserted here.
-  if (type === 'WSA')
-    filebody = "";
-  else 
-  // get file body and adjust templates for text payload
-  if (ctype = 'TEXT') {
-    filebody = fs.readFileSync(file, "utf8");
-  } else {
-  // get file body and adjust templates for binary payload
-  if (ctype = 'BINARY')) {
-    filebody = fs.readFileSync(file).toString('base64');
-    isbin = true;
-  } else {
-    tfiles.pre = tfiles.pre+'-TEXT';
-    tfiles.post = tfiles.post+'-TEXT';
-    filebody = fs.readFileSync(file, "utf8");
-  };
-
-*/
 
   // create subvals which can be used on PRE template or body if !templates
   // sub in credentials for WSSE case
@@ -203,17 +203,17 @@ var genUploadRequest = function(opts, cb) {
   if (opts.pass)
     subvals.PASSWORD = opts.pass;
 
-  // no read the templates
+  // now read the templates
   var str, bdy;
+
   // get template files and set request body
-  if (templates) {
-    str = fs.readFileSync(tfiles.pre, "utf8");
-    str = varSub(str, subvals);
-    cache.pre = str.substring(0, str.length-1);
-    str = fs.readFileSync(tfiles.post, "utf8");
-    cache.post = str.substring(0, str.length-1);
-    bdy = cache.pre +filebody +cache.post;
-  }; // we'll do else for no templates case later
+  str = getTemplate(tfiles.pre, reqtemps);
+  cache.pre = varSub(str, subvals);
+  str = getTemplate(tfiles.post, reqtemps);
+  cache.post = varSub(str, subvals);
+
+  bdy = cache.pre +filebody +cache.post;
+
   return cb(e, filesize, bdy);
 
 };

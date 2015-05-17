@@ -113,6 +113,27 @@ describe('omft-utils test suite', function() {
     });
   });
 
+  it('Validate no templates with reqtemps=false using file test/genSoapTest.data ', function() {
+    var mysize = 728;
+    var opts = {
+      "type":          "SOAP",
+      "file":          f4,
+      "maxsize":       26214400,
+      "reqtemps":       false,
+      "templatedir":   "INVALID_DIRNAME"
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, bdy) {
+      if (er) {
+        console.log('genSoapTest SOAP: error ' +er);
+        throw err;
+      } 
+      //console.log('genSoapTest SOAP: body:' +bdy);
+      var r9 = bdy.length;
+      expect(r9).to.equal(mysize); // verify results
+    });
+  });
+
 
 
 });

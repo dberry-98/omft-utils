@@ -9,8 +9,9 @@ var opts = {
   "type":          "SOAP",
   "ctype":         "binary",
   "file":          process.argv[1],
+  "reqtemps":      false, // true is default
   "maxsize":       26214400,
-  "templatedir":   path.join(__dirname, '../files')
+  "templatedir":   path.join(__dirname, '../FORCE_ERROR')
 };
 
 outils.genUploadRequest(opts, function(er, fsz, bdy) {

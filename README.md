@@ -25,18 +25,19 @@ npm install omft-utils --save
 
 
 ### Function genUploadRequest 
-#### Generate a payload for any type of MFT request. SOAP, WSA, WSSE ... 
+#### Returns a payload for any type of MFT request. SOAP, WSA, WSSE ... 
 #### Takes an options object as an argument so it is easy to extend.
 
-This is JSON file but supports coments.
+This is ithe JSON config file but supports comments.
 
 ```
 var opts = {
   "type": "SOAP",             // "WSA"
-  "ctype": "binary",          // "TEXT"
+  "ctype": "binary",          // "text" 
+  "reqtemps": true,           // require templates of false means only payload substitution if template not found
   "file": process.argv[1],
-  "maxsize": 26214400,
-  "templatedir": path.join(__dirname, '../files')
+  "maxsize": 26214400,        // 25MB limits the size of the SOAP payload. WSA can be higher value
+  "templatedir": path.join(__dirname, '../files') // overrides the default template dir
 };
 
 outils.genUploadRequest(opts, function(er, fsz, bdy) {
