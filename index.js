@@ -92,6 +92,11 @@ module.exports = {
       console.log(ex);
       throw ex;
     }
+
+    // support out of box RunScript arguments
+    if (!ret.file && (ret.filename && ret.dir)) {
+      ret.file = path.join(ret.dir, ret.filename);
+    };
     return ret;
   }
 };

@@ -176,6 +176,23 @@ describe('omft-utils test suite', function() {
     });
   });
 
+  it('TEST 12: Support OOTB RunScript callout parameters: filename & dir', function() {
+    var ar = [];
+    ar[0] = 'filename=binfile dir=test/';
+    ar[1] = 'outfile=out.xml outdir=/tmp/mft';
+    var obj = outils.parseCalloutArgs(ar);
+
+    if (!obj.file) {
+      var er = 'obj.file not found';
+      console.log(er);
+      throw er;
+    };
+
+    var resmatch = 'test/binfile out.xml /tmp/mft';
+    var r12 = obj.file +' ' +obj.outfile + ' ' +obj.outdir;
+    expect(r12).to.equal(resmatch); // verify results
+  });
+
 
 });
 
