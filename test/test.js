@@ -118,7 +118,6 @@ describe('omft-utils test suite', function() {
     var opts = {
       "type":          "SOAP",
       "file":          f4,
-      "maxsize":       26214400,
       "reqtemps":       false,
       "templatedir":   "INVALID_DIRNAME"
     };
@@ -134,7 +133,24 @@ describe('omft-utils test suite', function() {
     });
   });
 
+  it('Validate no payload returned with getbody=false using file test/binfile ', function() {
+    var mysize = 767;
+    var opts = {
+      "type":          "WSA",
+      "file":           f4,
+      "retbody":       false // true is default. False is for WSA where payload is separate from SOAP Payload.
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, soapbody) {
+      if (er) {
+        console.log('genSoapTest WSA: error ' +er);
+        throw err;
+      } 
+      //console.log('genSoapTest WSA: body:' +soapbody);
+      var r10 = soapbody.length;
+      expect(r10).to.equal(mysize); // verify results
+    });
+  });
 
 
 });
-

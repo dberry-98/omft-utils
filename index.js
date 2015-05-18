@@ -6,6 +6,7 @@ var fs = require("fs");
 _TEMPLATE_DIR = path.join(__dirname, '/files/');
 _ISBINARY = false;
 _REQUIRE_TEMPLATES_DEAFULT = true;
+_RETBODY_DEFAULT = true;
 
 function splitArgs(m, str) {
         str.split(' ').forEach(function(x){
@@ -132,8 +133,11 @@ var genUploadRequest = function(opts, cb) {
   var filebody = '';
   var gettxt = false;
   var getbin = false;
-  var getbody = true;
+  var retbody = (opts.retbody == false ? false : _RETBODY_DEFAULT);
   var reqtemps = (opts.reqtemps == false ? false : _REQUIRE_TEMPLATES_DEAFULT);
+
+  // keep this in for backward compatibility for now
+  type === 'WSA' ? retbody = false : false;
 
   //console.log("_ISBINARY: " +_ISBINARY);
   //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
@@ -158,42 +162,28 @@ var genUploadRequest = function(opts, cb) {
     post:     'placeholder',
   };
 
-
-  if (type === 'WSA') getbody= false;
-
-  //console.log("Ctype: " +ctype);
-  switch (ctype) {
-    case 'TEXT':
-      getbody ? getbody = ctype : false;
-      //console.log("TEXT Getbody: " +getbody +ctype);
-      break;
-    case 'BINARY':
-      getbody ? getbody = ctype : false;
-      //console.log("BINARY Getbody: " +getbody) +ctype;
-      break;
-    default: 
-      //console.log("DEFAULT Getbody: " +getbody) +ctype;
-      if (getbody) {
-        if (isBinary(file)) 
-          getbody = 'BINARY'
-        else
-          getbody = 'TEXT';
-      };
+  // get ctype dynamically if not provided
+  if (!ctype) {
+    if (isBinary(file)) 
+      ctype = 'BINARY'
+    else
+      ctype = 'TEXT';
   };
 
-  //console.log("Getbody: " +getbody);
-
-  // this is SOAP inline case
-  if (getbody == 'TEXT') { 
-    // assign the templates case
-    filebody = fs.readFileSync(file, "utf8");
-    tfiles.pre = tfiles.pre+'-TEXT';
-    tfiles.post = tfiles.post+'-TEXT';
-  }
-  // this is SOAP Binary
-  if (getbody == 'BINARY')
+  // this is SOAP TextInline case
+  if (ctype == 'TEXT') { 
+    // file being uploaded will be UTF8
+    if (retbody) { // get body if requested
+      filebody = fs.readFileSync(file, "utf8");
+      tfiles.pre = tfiles.pre+'-TEXT';
+      tfiles.post = tfiles.post+'-TEXT';
+    };
+  };
+  // this is SOAP BinaryInline case
+  if (retbody && ctype == 'BINARY') {
+    // file being uploaded will be BASE64 encoded
     filebody = fs.readFileSync(file).toString('base64');
-
+  };
 
   // create subvals which can be used on PRE template or body if !templates
   // sub in credentials for WSSE case
@@ -304,15 +294,3 @@ var varSub = function(data, vals, delim) {
 };
 module.exports.varSub = varSub;
 
-/*
-  for (var key in vals) {
-    if (vals.hasOwnProperty(key)) {
-      //console.log(key + " -> " + vals[key]);
-      var n1 =  key.toUpperCase();
-      n1 = delim +n1 +delim;
-      var v1 = vals[key]
-      data = data.myRep(n1, v1);
-    };
-  };
-
-*/

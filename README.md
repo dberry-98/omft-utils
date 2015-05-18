@@ -35,6 +35,7 @@ var opts = {
   "type": "SOAP",             // "WSA"
   "ctype": "binary",          // "text" 
   "reqtemps": true,           // require templates of false means only payload substitution if template not found
+  "retbody": true,            // or 'false' which means don't return file for things like WSA when file is outside the SOAP payload 
   "file": process.argv[1],
   "maxsize": 26214400,        // 25MB limits the size of the SOAP payload. WSA can be higher value
   "templatedir": path.join(__dirname, '../files') // overrides the default template dir

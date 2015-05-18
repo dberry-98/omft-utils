@@ -19,8 +19,7 @@ outils.genUploadRequest(opts, function(er, fsz, bdy) {
     console.log('genRequestTest SOAP: error ' +er);
     process.exit(1);
   }
-  var r5 = fsz;
-  console.log('SUCCESS: filesize is ' +fs);
+  console.log('SUCCESS: filesize is ' +fsz);
   console.log('file is   ' +opts.file);
   console.log('type is    ' +opts.type);
   console.log('ctype is   ' +opts.ctype);
