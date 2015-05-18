@@ -1,0 +1,9 @@
+
+File path is %FILEPATH%  This breaks the tests so commenting it out.
+File base is %%FILEBASE%%
+File name is %%FILENAME%%
+File extension is %%FILEEXT%%
+File dir is %%FILEDIR%%
+ISOTIME is %%ISOTIME%%   This may break the tests as well.
+Username is %%USERNAME%%
+Password is %%PASSWORD%%

@@ -187,7 +187,14 @@ var genUploadRequest = function(opts, cb) {
 
   // create subvals which can be used on PRE template or body if !templates
   // sub in credentials for WSSE case
-  subvals.FILENAME = file;
+
+  var fi = path.parse(file);
+  subvals.FILEBASE = fi.base;  // foo.bar
+  subvals.FILENAME = fi.name;  // foo
+  subvals.FILEEXT = fi.ext;    // bar
+  subvals.FILEDIR = fi.dir;    // bar
+  subvals.FILEPATH = path.resolve(fi.dir);
+
   subvals.ISOTIME = ts;
   if (opts.user)
     subvals.USERNAME = opts.user;

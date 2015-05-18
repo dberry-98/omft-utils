@@ -11,6 +11,15 @@ npm install omft-utils --save
 
 [See examples folder](examples)
 
+* doSub.js
+* genRequest.js
+* isbin.js
+* nobody.js
+* notemps.js
+* parseCallout.js
+* templates.js
+
+
 ### Function parseCalloutArgs
 #### Parse arguments from an MFT callout
 
@@ -86,6 +95,24 @@ try {
   console.log(e);
 };
 ```
+
+### TEMPLATES
+#### The following default template variables are supported.
+
+See the [examples/templates.js](examples/template.js).
+
+File variables follow the [Node Path Parse](https://nodejs.org/api/path.html#path_path_parse_pathstring) implementation
+
+```
+%%FILEPATH%%   /user/me/test/foo.bar
+%%FILEBASE%%   foo.bar    
+%%FILENAME%%   foo
+%%FILEEXT%%    .bar
+%%FILEDIR%%    test
+%%ISOTIME%%    2029-05-15T18:36:07.428Z  
+%%USERNAME%%   JANE
+%%PASSWORD%%   TARZAN
+``
 
 ## Test
 

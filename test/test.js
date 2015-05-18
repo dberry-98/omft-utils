@@ -7,8 +7,9 @@ describe('omft-utils test suite', function() {
   var f1 = './test/binfile';
   var f2 = 'README.md';
   var f4 = './test/genSoapTest.data';
+  var f11 = 'test/template.data';
 
-  it('Return true for file ' +f1, function() {
+  it('TEST 1: eturn true for file ' +f1, function() {
     var r1 = outils.isBinary(f1);
     expect(r1).to.be.true; // verify results
   });
@@ -18,7 +19,7 @@ describe('omft-utils test suite', function() {
     expect(r2).to.be.false; // verify results
   });
 
-  it('Parse input parameters from MFT RunScript callout ', function() {
+  it('TEST 2: Parse input parameters from MFT RunScript callout ', function() {
     var ar = [];
     ar[0] = 'file=test.xml';
     ar[1] = 'outfile=out.xml outdir=/tmp/mft';
@@ -28,7 +29,7 @@ describe('omft-utils test suite', function() {
     expect(r3).to.equal(resmatch); // verify results
   });
 
-  it('Validate generated soap body filesize for file test/genSoapTest.data ', function() {
+  it('TEST 3: Validate generated soap body filesize for file test/genSoapTest.data ', function() {
     var mysize = 544;
     outils.genUploadSOAP(f4, 999999999, 'SOAP', function(er, fsz, bdy) {
       if (er) {
@@ -40,8 +41,8 @@ describe('omft-utils test suite', function() {
     });
   });
 
-  it('Validate generated soap body empty for type=WSA attachments', function() {
-    var mysize = 753;
+  it('TEST 4: Validate generated soap body empty for type=WSA attachments', function() {
+    var mysize = 745;
     outils.genUploadSOAP(f4, 999999999, 'WSA', function(er, fsz, bdy) {
       if (er) {
         console.log('genSoapTest WSA: error ' +er);
@@ -53,8 +54,8 @@ describe('omft-utils test suite', function() {
     });
   });
 
-  it('Validate templating and generated request body filesize for file test/genSoapTest.data ', function() {
-    var mysize = 1328;
+  it('TEST 5: Validate templating and generated request body filesize for file test/genSoapTest.data ', function() {
+    var mysize = 1314;
     var opts = {
       "type":          "SOAP",
       "file":          f4,
@@ -64,16 +65,16 @@ describe('omft-utils test suite', function() {
 
     outils.genUploadRequest(opts, function(er, fsz, bdy) {
       if (er) {
-        console.log('genSoapTest SOAP: error ' +er);
+        console.log('genUploadRequestTest SOAP: error ' +er);
         throw err;
       } 
-      //console.log('genSoapTest SOAP: body:' +bdy);
+      //console.log('genUploadRequestTest SOAP: body:' +bdy);
       var r5 = bdy.length;
       expect(r5).to.equal(mysize); // verify results
     });
   });
 
-  it('Validate varSub templating ', function() {
+  it('TEST 6: Validate varSub templating ', function() {
     var mystr = 'Hello Dave it is now '; 
     var ts = new Date().toISOString();
     var data =  'Hello %%NAME%% it is now %%ISOTIME%%';
@@ -82,7 +83,7 @@ describe('omft-utils test suite', function() {
     expect(r6).to.have.string(mystr); // verify results
   });
 
-  it('Validate varSub templating with alternate substr', function() {
+  it('TEST 7: Validate varSub templating with alternate substr', function() {
     var mystr = 'Hello Dave it is now %%ISOTIME%%'; 
     var ts = new Date().toISOString();
     var data = 'Hello ##NAME## it is now %%ISOTIME%%';
@@ -92,8 +93,8 @@ describe('omft-utils test suite', function() {
   });
 
 
-  it('Test ctype=text for file test/genSoapTest.data ', function() {
-    var mysize = 1141;
+  it('TEST 8: Test ctype=text for file test/genSoapTest.data ', function() {
+    var mysize = 1127;
     var opts = {
       "type":          "SOAP",
       "ctype":         "TEXT",
@@ -104,7 +105,7 @@ describe('omft-utils test suite', function() {
 
     outils.genUploadRequest(opts, function(er, fsz, bdy) {
       if (er) {
-        console.log('genSoapTest SOAP: error ' +er);
+        console.log('genUploadRequestTest SOAP: error ' +er);
         throw err;
       } 
       //console.log('genSoapTest SOAP: body:' +bdy);
@@ -113,7 +114,7 @@ describe('omft-utils test suite', function() {
     });
   });
 
-  it('Validate no templates with reqtemps=false using file test/genSoapTest.data ', function() {
+  it('TEST 9: Validate no templates with reqtemps=false using file test/genSoapTest.data ', function() {
     var mysize = 728;
     var opts = {
       "type":          "SOAP",
@@ -127,14 +128,14 @@ describe('omft-utils test suite', function() {
         console.log('genSoapTest SOAP: error ' +er);
         throw err;
       } 
-      //console.log('genSoapTest SOAP: body:' +bdy);
+      //console.log('genUploadRequestTest SOAP: body:' +bdy);
       var r9 = bdy.length;
       expect(r9).to.equal(mysize); // verify results
     });
   });
 
-  it('Validate no payload returned with getbody=false using file test/binfile ', function() {
-    var mysize = 767;
+  it('TEST 10: Validate no payload returned with getbody=false using file test/binfile ', function() {
+    var mysize = 753;
     var opts = {
       "type":          "WSA",
       "file":           f4,
@@ -146,11 +147,35 @@ describe('omft-utils test suite', function() {
         console.log('genSoapTest WSA: error ' +er);
         throw err;
       } 
-      //console.log('genSoapTest WSA: body:' +soapbody);
+      //console.log('genUploadRequestTest WSA: body:' +soapbody);
       var r10 = soapbody.length;
       expect(r10).to.equal(mysize); // verify results
     });
   });
 
+  it('TEST 11: Template subvars validation using file test/template.data', function() {
+    var mysize = 271;
+    var opts = {
+      "type":          "SOAP",
+      "ctype":         "TEXT",
+      "file":          f11,
+      "reqtemps":      false,
+      "templatedir":   "NOTEMPLATES",
+      "user":          "SCOTTISH",
+      "pass":          "LIONS"
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, rawbody) {
+      if (er) {
+        console.log('genUploadRequestTest Template Test: error ' +er);
+        throw err;
+      } 
+      //console.log('genUploadRequest Test Template: body:' +rawbody);
+      var r11 = rawbody.length;
+      expect(r11).to.equal(mysize); // verify results
+    });
+  });
+
 
 });
+
