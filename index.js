@@ -188,6 +188,7 @@ var genUploadRequest = function(opts, cb) {
   // create subvals which can be used on PRE template or body if !templates
   // sub in credentials for WSSE case
   subvals.FILENAME = file;
+  subvals.ISOTIME = ts;
   if (opts.user)
     subvals.USERNAME = opts.user;
   if (opts.pass)
@@ -201,6 +202,11 @@ var genUploadRequest = function(opts, cb) {
   cache.pre = varSub(str, subvals);
   str = getTemplate(tfiles.post, reqtemps);
   cache.post = varSub(str, subvals);
+
+  // have to do subs on body if no tempplates being used. ODI and UCM notify use case
+  if (filebody && !reqtemps) {
+    filebody = varSub(filebody, subvals);
+  };
 
   bdy = cache.pre +filebody +cache.post;
 
