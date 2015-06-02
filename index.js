@@ -5,7 +5,7 @@ var fs = require("fs");
 
 _TEMPLATE_DIR = path.join(__dirname, '/files/');
 _ISBINARY = false;
-_REQUIRE_TEMPLATES_DEAFULT = true;
+_REQUIRE_TEMPLATES_DEFAULT = true;
 _RETBODY_DEFAULT = true;
 
 function splitArgs(m, str) {
@@ -121,51 +121,53 @@ var _options = {
   "ctype":         "binary", // || TEXT // binary==base64 encoding text==utf8
   "file":          "",
   "maxsize":       26214400,
-  "templatedir":   ""
+  "template":      ""
 };
 */
 
 // wrapper function for genUploadSOAP and others
 var genUploadRequest = function(opts, cb) {
+  var ts = new Date().toISOString();
+  var filebody = '';
+  var subvals = {};
+  var gettxt = false;
+  var getbin = false;
+
+// opts
   var type = opts.type;
   var ctype = opts.ctype;            
   if (ctype) ctype=ctype.toUpperCase();
   var file = opts.file;
   var maxsize = opts.maxsize 
   var templatedir = opts.templatedir;
-  var subvals = {};
-  var ts = new Date().toISOString();
-  var filebody = '';
-  var gettxt = false;
-  var getbin = false;
+  var template = opts.template;
   var retbody = (opts.retbody == false ? false : _RETBODY_DEFAULT);
-  var reqtemps = (opts.reqtemps == false ? false : _REQUIRE_TEMPLATES_DEAFULT);
+  var reqtemps = (opts.reqtemps == false ? false : _REQUIRE_TEMPLATES_DEFAULT);
+  var tvars = opts.templatevars;
 
   // keep this in for backward compatibility for now
   type === 'WSA' ? retbody = false : false;
 
   //console.log("_ISBINARY: " +_ISBINARY);
   //console.log("templatedir: " +templatedir +" " +_TEMPLATE_DIR);
+  //console.log("template: " +template);
 
   // validate file
   var fstats = fs.statSync(file);
   var filesize = fstats["size"];
 
   if (filesize > maxsize) {
-    var e = 'generateUploadSOAP ERROR: ' +filename +' filesize ' +filesize + ' exceeds maximum supported size of ' +maxsize;
+    var e = 'generateUploadRequest ERROR: ' +filename +' filesize ' +filesize + ' exceeds maximum supported size of ' +maxsize;
     return cb(e);
   }
 
   var tdir = templatedir || _TEMPLATE_DIR;
-  var tfiles = {
-    pre:     path.join(tdir, type +'-PAYLOAD-PRE'),
-    post:    path.join(tdir, type +'-PAYLOAD-POST')
-  };
-
-  var cache = {
-    pre:      'placeholder',
-    post:     'placeholder',
-  };
+  var tfile = path.join(tdir, type +'-PAYLOAD');
+  if (template && templatedir) {
+    var e = 'generateUploadRequest ERROR: template and templatedir cannot be used together:' +template +' ' +templatedir;
+    return cb(e);
+  }
+  if (template) tfile=template;
 
   // get ctype dynamically if not provided
   if (!ctype) {
@@ -180,8 +182,7 @@ var genUploadRequest = function(opts, cb) {
     // file being uploaded will be UTF8
     if (retbody) { // get body if requested
       filebody = fs.readFileSync(file, "utf8");
-      tfiles.pre = tfiles.pre+'-TEXT';
-      tfiles.post = tfiles.post+'-TEXT';
+      if (!template) tfile = tfile +'-TEXT';
     };
   };
   // this is SOAP BinaryInline case
@@ -190,14 +191,14 @@ var genUploadRequest = function(opts, cb) {
     filebody = fs.readFileSync(file).toString('base64');
   };
 
-  // create subvals which can be used on PRE template or body if !templates
+  // create subvals which can be used on the template or body if !templates
   // sub in credentials for WSSE case
 
   var fi = path.parse(file);
   subvals.FILEBASE = fi.base;  // foo.bar
   subvals.FILENAME = fi.name;  // foo
-  subvals.FILEEXT = fi.ext;    // bar
-  subvals.FILEDIR = fi.dir;    // bar
+  subvals.FILEEXT =  fi.ext;   // bar
+  subvals.FILEDIR =  fi.dir;   // bar
   subvals.FILEPATH = path.resolve(fi.dir);
 
   subvals.ISOTIME = ts;
@@ -209,76 +210,42 @@ var genUploadRequest = function(opts, cb) {
   // now read the templates
   var str, bdy;
 
-  // get template files and set request body
-  str = getTemplate(tfiles.pre, reqtemps);
-  cache.pre = varSub(str, subvals);
-  str = getTemplate(tfiles.post, reqtemps);
-  cache.post = varSub(str, subvals);
+  // merge in tvars if provided 
+  if (tvars) {
+    //console.log("Adding tvars: " +tvars);  
+    tvars = upperNames(tvars);
+    //console.log(tvars);
+    subvals = mergeObjs(subvals, tvars);
+  };
 
-  // have to do subs on body if no tempplates being used. ODI and UCM notify use case
+  // get template files and set request body
+  str = getTemplate(tfile, reqtemps);
+  var tdata = varSub(str, subvals);
+
+  // have to do subs on body if no templates being used. WSA, ODI and HCM notify use casess
   if (filebody && !reqtemps) {
     filebody = varSub(filebody, subvals);
   };
 
-  bdy = cache.pre +filebody +cache.post;
+  // support %%FILEBODY%% in the template
+  if (filebody && tdata) {
+    var fbstr = '%%FILEBODY%%';
+    var ba = tdata.split(fbstr);
+
+    // kind of a hack but should work
+    if (ba && ba.length == 2) {
+      tdata = ba[0] +filebody +ba[1];
+      filebody = '';
+    };
+  };
+
+  bdy = tdata +filebody;
 
   return cb(e, filesize, bdy);
 
 };
 
 module.exports.genUploadRequest = genUploadRequest;
-
-// generate SOAP body for SOAP Upload
-var genUploadSOAP = function(filepath, maxfilesize, type, cb) {
-  //console.log('genUploadSOAP: '+filepath +' ' +maxfilesize);
-  // cb(err, soapbody)
-  var soaptype = type || "SOAP";
-
-  var tdir = _TEMPLATE_DIR; 
-  var tfiles = {
-    pre:     path.join(tdir, soaptype +'-PAYLOAD-PRE'),
-    post:    path.join(tdir, soaptype +'-PAYLOAD-POST')
-  };
-
-  var cache = {
-    pre:      'placeholder',
-    post:     'placeholder',
-  };
-
-  // validate file
-  var filename =  path.basename(filepath);
-  var fstats = fs.statSync(filepath);
-  var filesize = fstats["size"];
-
-  if (filesize > maxfilesize) {
-    var e = 'generateUploadSOAP ERROR: ' +filename +' filesize ' +filesize + ' exceeds maximum supported size of ' +maxfilesize;
-    return cb(e);
-  }
-
-  // a bit of a hack to support WSA which doens't want the body inserted here.
-  if (type === 'WSA')
-    filebody = "";
-  else 
-  // get file body and adjust templates for binary payload
-  if (_ISBINARY || isBinary(filepath)) {
-    filebody = fs.readFileSync(filepath).toString('base64');
-  } else {
-    tfiles.pre = tfiles.pre+'-TEXT';
-    tfiles.post = tfiles.post+'-TEXT';
-    filebody = fs.readFileSync(filepath, "utf8");
-  };
-
-  // get template files and set request body
-  var str = fs.readFileSync(tfiles.pre, "utf8");
-  str = str.replace(/%%FILENAME%%/g, filename);
-  cache.pre = str.substring(0, str.length-1);
-  str = fs.readFileSync(tfiles.post, "utf8");
-  cache.post = str.substring(0, str.length-1);
-  var bdy = cache.pre +filebody +cache.post;
-  return cb(e, filesize, bdy);
-};
-
-module.exports.genUploadSOAP = genUploadSOAP;
 
 // function do paramterised substistutions
 String.prototype.myRep = function (replaceThis, withThis) {
@@ -289,13 +256,11 @@ module.exports.myRep = String.prototype.myRep;
 
 // function to do Templatized substitution
 var varSub = function(data, vals, delim) {
-// data = "Hello %%NAME%% it is now %%ISOTIME%%"
-// nvp = {"nAmE": 'dave", "isotime": ""};
+  // data = "Hello %%NAME%% it is now %%ISOTIME%%"
+  // vals = {"nAmE": 'dave", "isotime": ""};
 
+  // support external substitution delimeters
   if (!delim) delim = '%%';
-
-// data is field that gets changed
-// nvp is list of sub names and values
 
   for (var key in vals) {
     if (vals.hasOwnProperty(key)) {
@@ -311,4 +276,56 @@ var varSub = function(data, vals, delim) {
   return data;
 };
 module.exports.varSub = varSub;
+
+// function to uppercase NAMES in ob n/v pairs
+var upperNames = function(obj) {
+  // vals = {"nAmE": 'dave", "country": "Mx"};
+  // vals = {"NAME": 'dave", "COUNTRY": "Mx"};
+  var retobj = {};
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      var v1 = obj[key]
+      var N1 =  key.toUpperCase();;
+      retobj[N1] = v1 
+    };
+  };
+  //console.log('upperNames:" +retobj);
+  return retobj;
+};
+
+// function to merge variables from obj1 and obj2
+// does not override existing objects already in obj2
+// function returns updated obj2 ans obj3
+var mergeObjs = function(obj1, obj2) {
+  // Example
+  // obj1 = {"name": 'dave", "sex": "m", "country": "USA"};
+  // obj2 = {"name": 'jean", "sex": "f", "areacode": 212};
+  // returns
+  // obj3 = {"name": 'jean", "sex": "f", "areacode": 212, "country": "USA"};
+
+  var obj3 = obj2;
+
+  // data is field that gets changed
+  // nvp is list of sub names and values
+
+  // iterate thru obj1 and add to obj2 if not already present
+  for (var key in obj1) {
+    if (obj1.hasOwnProperty(key)) {
+      //console.log(key + " -> " + obj1[key]);
+      var n1 =  key;
+      var v1 = obj1[n1]
+      var v2 = obj2[n1]
+      //console.log(n1 + " -> " + v1 +' ' +v2);
+      if (!v2) {
+        //obj3.n1 = v1;
+        obj3[n1] = v1;
+        //console.log("  ADDING:" +n1 +' ' +v1);
+      } else {
+        //console.log("  EXITS:" +n1 +' ' +v1);
+      };
+    };
+  };
+  return obj3;
+};
+
 

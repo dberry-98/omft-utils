@@ -18,6 +18,8 @@ coverage
 
 # tmp files for backup or whatever
 .tmp
+.bu
+.bak
 
 # node-waf configuration
 .lock-wscript

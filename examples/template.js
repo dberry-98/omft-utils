@@ -2,18 +2,13 @@ var outils = require('..');
 var fs = require("fs");
 var path = require("path");
 
-var type = 'SOAP';
-var tdirs = 'FORCE_NO_TEMPLATES';
+// Shows how to override the template file to make substutution happen
 
 var opts = {
-  "type":          type,
+  "type":          "SOAP",
   "ctype":         "TEXT",
-  //"file":          process.argv[1],
-  "file":          __dirname+'/../test/template.data',
-  "reqtemps":      false,
-  "templatedir":   tdirs,
-  "user":     "SCOTTISH",
-  "pass":      "LIONS",
+  "template":      __dirname+'/../test/template.data',
+  "file":         __dirname+'/../test/binfile'
 };
 
 outils.genUploadRequest(opts, function(er, fsz, bdy) {
@@ -22,10 +17,10 @@ outils.genUploadRequest(opts, function(er, fsz, bdy) {
     process.exit(1);
   }
   console.log('SUCCESS: filesize is ' +fsz);
+  console.log('overriden template is   ' +opts.template);
   console.log('file is   ' +opts.file);
   console.log('type is    ' +opts.type);
   console.log('ctype is    ' +opts.ctype);
-  console.log('Username is    ' +opts.USERNAME);
-  console.log('Password is    ' +opts.PASSWORD);
   console.log('Body is:' +"\n" +bdy);
 });
+

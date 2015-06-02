@@ -6,5 +6,8 @@
         </ns1:MFTHeader>
     </soap:Header>
     <soap:Body>
-        <ns1:MFTServiceInput xmlns:ns1="http://xmlns.oracle.com/fmw/mft/soap" PayloadType="InlineXML">
-            <ns1:InlinePayload><![CDATA[
+        <ns1:MFTServiceInput xmlns:ns1="http://xmlns.oracle.com/fmw/mft/soap" PayloadType="InlineBinary">
+            <ns1:BinaryPayload><![CDATA[%%FILEBODY%%]]></ns1:BinaryPayload>
+        </ns1:MFTServiceInput>
+    </soap:Body>
+</soap:Envelope>

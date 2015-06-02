@@ -37,11 +37,11 @@ npm install omft-utils --save
 #### Returns a payload for any type of MFT request. SOAP, WSA, WSSE ... 
 #### Takes an options object as an argument so it is easy to extend.
 
-This is ithe JSON config file but supports comments.
+This is a basic SOAP JSON config file that supports comments.
 
 ```
 var opts = {
-  "type": "SOAP",             // "WSA"
+  "type": "SOAP",             // Inline or Binary XML
   "ctype": "binary",          // "text" 
   "reqtemps": true,           // require templates of false means only payload substitution if template not found
   "retbody": true,            // or 'false' which means don't return file for things like WSA when file is outside the SOAP payload 
@@ -63,6 +63,35 @@ outils.genUploadRequest(opts, function(er, fsz, bdy) {
   console.log('templatedir is   ' +opts.templatedir);
   console.log('Body is   ' +bdy);
 });
+```
+
+### Example JSON Config file to support MFT SOAP with Attachments(SwA)
+#### Enables support for streaming and larger payloads
+
+```
+{
+  "type": "WSA",
+  "maxsize": 5242880026214400,
+  "request": {
+    "uri": "http://HOSTNMAE.com:7901/mftapp/services/transfer/SOAP2File",
+    "method": "POST",
+    "headers": {
+       "FileName": "",
+       "Content-Type": "multipart/related;type=\"text/xml\""
+    },
+    "multipart": [
+       {
+         "Content-Type": "text/xml;charset=UTF-8",
+         "body": "",
+         "auth": { "user": "USERNAME", "pass": "PASSWORD" }
+       },
+       {
+         "Content-Type": "application/octet-stream",
+         "body": ""
+       }
+    ]
+  }
+}
 ```
 
 ### Function varSub
