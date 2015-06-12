@@ -237,6 +237,24 @@ describe('omft-utils test suite', function() {
   });
 
 
+  it('TEST 15: Test maxsize error', function() {
+    var myrs = 'generateUploadRequest ERROR: ./test/genRequestTest.data filesize 544 exceeds maximum supported size of 40';
+    var opts = {
+      "type":          "SOAP",
+      "file":          f4,
+      "maxsize":       40
+      //"template":      __dirname+'/SOAP-PAYLOAD-TEXT'
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, bdy) {
+      //if (er) {
+      //} 
+      //console.log(opts);
+      expect(er).to.equal(myrs); // verify results
+    });
+  });
+
+
 
 });
 

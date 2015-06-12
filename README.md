@@ -65,35 +65,6 @@ outils.genUploadRequest(opts, function(er, fsz, bdy) {
 });
 ```
 
-### Example JSON Config file to support MFT SOAP with Attachments(SwA)
-#### Enables support for streaming and larger payloads
-
-```
-{
-  "type": "WSA",
-  "maxsize": 5242880026214400,
-  "request": {
-    "uri": "http://HOSTNMAE.com:7901/mftapp/services/transfer/SOAP2File",
-    "method": "POST",
-    "headers": {
-       "FileName": "",
-       "Content-Type": "multipart/related;type=\"text/xml\""
-    },
-    "multipart": [
-       {
-         "Content-Type": "text/xml;charset=UTF-8",
-         "body": "",
-         "auth": { "user": "USERNAME", "pass": "PASSWORD" }
-       },
-       {
-         "Content-Type": "application/octet-stream",
-         "body": ""
-       }
-    ]
-  }
-}
-```
-
 ### Function varSub
 #### A simple paramterized substitution templating interface
 #### Takes date string and subvar object as arguments with optional delimeter as 3rd argument

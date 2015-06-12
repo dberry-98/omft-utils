@@ -157,7 +157,7 @@ var genUploadRequest = function(opts, cb) {
   var filesize = fstats["size"];
 
   if (filesize > maxsize) {
-    var e = 'generateUploadRequest ERROR: ' +filename +' filesize ' +filesize + ' exceeds maximum supported size of ' +maxsize;
+    var e = 'generateUploadRequest ERROR: ' +file +' filesize ' +filesize + ' exceeds maximum supported size of ' +maxsize;
     return cb(e);
   }
 
