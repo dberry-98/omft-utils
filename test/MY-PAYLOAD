@@ -1,0 +1,13 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+        <ns1:MFTHeader xmlns:ns1="http://xmlns.oracle.com/fmw/mft/soap">
+            <ns1:TargetFilename>%%FILEBASE%%</ns1:TargetFilename>
+            <ns1:file.name>%%FILEBASE%%</ns1:file.name>
+        </ns1:MFTHeader>
+    </soap:Header>
+    <soap:Body>
+        <ns1:MFTServiceInput xmlns:ns1="http://xmlns.oracle.com/fmw/mft/soap" PayloadType="InlineXML">
+            <ns1:InlinePayload><![CDATA[%%FILEBODY%%]]></ns1:InlinePayload>
+        </ns1:MFTServiceInput>
+    </soap:Body>
+</soap:Envelope>

@@ -2,6 +2,7 @@
 var chai = require('chai');
 var expect = chai.expect;
 var outils = require('..');
+var path = require('path');
 
 describe('omft-utils test suite', function() {
   var f1 = './test/binfile';
@@ -243,7 +244,6 @@ describe('omft-utils test suite', function() {
       "type":          "SOAP",
       "file":          f4,
       "maxsize":       40
-      //"template":      __dirname+'/SOAP-PAYLOAD-TEXT'
     };
 
     outils.genUploadRequest(opts, function(er, fsz, bdy) {
@@ -254,6 +254,26 @@ describe('omft-utils test suite', function() {
     });
   });
 
+  it('TEST 16: Test custom "template" config option', function() {
+    var mysize = 1133;
+    var opts = {
+      "type":          "SOAP",
+      "ctype":         "TEXT",
+      "file":          f4,
+      "maxsize":       26214400,
+      "template":      path.join(__dirname, 'MY-PAYLOAD')
+    };
+
+    outils.genUploadRequest(opts, function(er, fsz, bdy) {
+      if (er) {
+        console.log('genUploadRequestTest SOAP: error ' +er);
+        throw er;
+      } 
+      //console.log('genSoapTest SOAP: body:' +bdy);
+      var r8 = bdy.length;
+      expect(r8).to.equal(mysize); // verify results
+    });
+  });
 
 
 });

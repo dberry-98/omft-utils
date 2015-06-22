@@ -18,6 +18,7 @@ npm install omft-utils --save
 * notemps.js
 * parseCallout.js
 * templates.js
+* template.js
 
 
 ### Function parseCalloutArgs
@@ -96,7 +97,7 @@ try {
 };
 ```
 
-### TEMPLATES
+### TEMPLATE SUBSTITUTION VARIABLES
 #### The following default template variables are supported.
 
 See the [examples/templates.js](examples/template.js).
