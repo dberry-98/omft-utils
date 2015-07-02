@@ -8,16 +8,42 @@ _ISBINARY = false;
 _REQUIRE_TEMPLATES_DEFAULT = true;
 _RETBODY_DEFAULT = true;
 
-function splitArgs(m, str) {
-        str.split(' ').forEach(function(x){
-                var arr = x.split('=');
-                var a0 = arr[0];
-                var a1 = arr[1];
-                if (a1) {
-                  arr[1] && (m[arr[0]] = arr[1]);
+function splitArgs(retm, str) {
+        // need to support 'a=1' OR 'b=2 c=3' OR 'd=4 5' OR 'e=5 f=6 7'
+        // str='A=a1 B=b2 C=c3 c4 c5'
+        var i = 0;
+        var l;
+        var n, v, si, x1, x2, l, ln, lo;
+        var sa1 = str.split(' ');
+        //console.log('SPLITARGS str:' +str);
+        str.split('=').forEach(function(x1){
+                //console.log('SPLITARGS OUTER:', x1);
+                l = x1.length;
+                si = x1.lastIndexOf(' ');
+                i++;
+                if (i === 1) {
+                        n = x1.toLowerCase();
+                        //console.log('SPLITARGS    INNER FIRST NAME: ' +n);
+                } else {
+                        v = (x1.substr(0, si)).trim();
+                        //console.log('SPLITARGS    INNER NAME/VALUE: ' +n +'/' +v);
+			if (n && v) {
+			  n = n.toLowerCase();
+                          retm[n] = v;
+			}
+                        ln = n;
+                        n = (x1.substr(si)).trim();
+                        lo = x1
                 };
+
         });
+	if (lo) {
+          v = lo;
+          retm[ln] = v;
+        };
+        //console.log('SPLITARGS RETURNING: ', retm, "\n");
 };
+
 
 // convenience method to get the templates files
 // returns an error or the file
@@ -84,8 +110,7 @@ module.exports = {
     if (!ar) return ret;
     try {
       ar.forEach(function (val, index, array) {
-        var linedata = index + ': ' + val;
-        splitArgs(ret, linedata);
+        splitArgs(ret, val);
       });
     } catch (e) {
       var ex  = 'parseCalloutArgs exception: ' +e;
@@ -125,7 +150,7 @@ var _options = {
 };
 */
 
-// wrapper function for genUploadSOAP and others
+// function do template substitution
 var genUploadRequest = function(opts, cb) {
   var ts = new Date().toISOString();
   var filebody = '';

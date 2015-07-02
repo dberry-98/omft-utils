@@ -20,6 +20,7 @@ coverage
 .tmp
 .bu
 .bak
+.mft
 
 # node-waf configuration
 .lock-wscript

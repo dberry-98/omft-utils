@@ -24,9 +24,16 @@ describe('omft-utils test suite', function() {
     var ar = [];
     ar[0] = 'file=test.xml';
     ar[1] = 'outfile=out.xml outdir=/tmp/mft';
+    ar[2] = ' ';
+    ar[3] = 'a=';
+    ar[4] = 'bb';
+    ar[5] = ' cc=dddd e';
+    ar[6] = 'Passwords=pass1 pass2';
     var obj = outils.parseCalloutArgs(ar);
-    var resmatch = 'test.xml out.xml /tmp/mft';
-    var r3 = obj.file +' ' +obj.outfile + ' ' +obj.outdir;
+    //console.log(ar);
+    //console.log(obj);
+    var resmatch = 'test.xml out.xml /tmp/mft pass1 pass2';
+    var r3 = obj.file +' ' +obj.outfile + ' ' +obj.outdir +' ' +obj.passwords;
     expect(r3).to.equal(resmatch); // verify results
   });
 
