@@ -74,13 +74,13 @@ module.exports = {
    * @return {Boolean}
    *
   **/
-  isBinary: function(filename) {
+  isBinary: function(filename, buffer) {
     var retval;
 
     // validate file exists
-    var fstats = fs.statSync(filename);
+    if (filename) var fstats = fs.statSync(filename);
 
-    require('istextorbinary').isBinary(filename, '', function(err, result){
+    require('istextorbinary').isBinary(filename, buffer, function(err, result){
       if (err) {
         var ex  = 'isBinary exception: ' +err;
         console.log(ex);
@@ -231,6 +231,12 @@ var genUploadRequest = function(opts, cb) {
     subvals.USERNAME = opts.user;
   if (opts.pass)
     subvals.PASSWORD = opts.pass;
+  if (opts.docid) 
+    subvals.DOCID= opts.docid;
+  if (opts.searchfile) 
+    subvals.SEARCHFILE = opts.searchfile;
+
+  //console.log('SUBVALS:', subvals);
 
   // now read the templates
   var str, bdy;

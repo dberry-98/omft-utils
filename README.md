@@ -79,6 +79,7 @@ console.log(outils.varSub(data, vals));
 
 ### Function isBinary
 #### Checks the file type before upload
+#### Arguments are "filespec, buffer"
 #### Returns true for binary, false for text or error for file not found
 
 ```
@@ -89,9 +90,9 @@ var f3 = 'NOFILE';
 var result,s;
 
 try {
-  console.log(outils.isBinary(f1)); // returns true
-  console.log(outils.isBinary(f2)); // returns false
-  console.log(outils.isBinary(f3)); // throws error
+  console.log(outils.isBinary(f1, '')); // returns true
+  console.log(outils.isBinary(f2, '')); // returns false
+  console.log(outils.isBinary(f3, '')); // throws error
 } catch (e) {
   console.log(e);
 };
