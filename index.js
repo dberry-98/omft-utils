@@ -235,7 +235,10 @@ var genUploadRequest = function(opts, cb) {
     subvals.DOCID= opts.docid;
   if (opts.searchfile) 
     subvals.SEARCHFILE = opts.searchfile;
+  if (opts.businessobject)
+    subvals.BUSINESSOBJECT=opts.businessobject;
 
+  //console.log('OPTS:', opts);
   //console.log('SUBVALS:', subvals);
 
   // now read the templates
@@ -257,6 +260,7 @@ var genUploadRequest = function(opts, cb) {
   if (filebody && !reqtemps) {
     filebody = varSub(filebody, subvals);
   };
+  //console.log('FILEBODY:', filebody);
 
   // support %%FILEBODY%% in the template
   if (filebody && tdata) {
@@ -272,6 +276,7 @@ var genUploadRequest = function(opts, cb) {
 
   bdy = tdata +filebody;
 
+  //console.log('BODY:', bdy);
   return cb(e, filesize, bdy);
 
 };
